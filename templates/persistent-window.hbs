@@ -1,0 +1,29 @@
+<form>
+  <div>
+    <p>Persistent Effect Type</p>
+    <div class='automated-effets effects-window damage-types types'>
+      {{#each types}}
+        <div>
+          <input type='radio' name='type' id='{{this.damageType}}' value='{{this.damageType}}' />
+          <label for='{{this.damageType}}'><img src='{{this.img}}' />{{this.name}}</label>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <div class='automated-effets effects-window form-group'>
+    <div class='form-fields'>
+      <label>Formula:</label>
+      <input title='Whats the damage formula for this Effect?' type='text' name='damage' placeholder='1d6' />
+      <label>Difficulty&nbsp;Class:</label>
+      <input title='Whats the recovery DC of this Effect?' type='number' name='DC' placeholder='15' />
+      <label>Duration:</label>
+      <input title='How long should this effect last? 0 for forever' type='number' name='duration' placeholder='0' />
+      <label>End&nbsp;of&nbsp;Turn:</label>
+      <input checked title='Should this Effect tick at the end of turn?' type='checkbox' name='endOfTurn' />
+    </div>
+  </div>
+</form>
+<div>
+  <button type='button' name='apply'>Apply</button>
+</div>

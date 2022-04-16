@@ -1,0 +1,24 @@
+{
+  "name": "pf2e-advanced-automation",
+  "title": "PF2e Advanced Automation",
+  "description": "Adds more automation to the PF2e system",
+  "author": "Chippy",
+  "version": "0.1.0",
+  "minimumCoreVersion": "9",
+  "compatibleCoreVersion": "9",
+  "scripts": ["advanced-automation.js"],
+  "styles": ["styles/style.css"],
+  "dependencies": [
+    {
+      "name": "pf2e",
+      "type": "system"
+    }
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ]
+}
