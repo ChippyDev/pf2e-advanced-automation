@@ -11,7 +11,7 @@
   ],
   "minimumCoreVersion": "9",
   "compatibleCoreVersion": "9",
-  "scripts": ["advanced-automation.js"],
+  "scripts": ["scripts/advanced-automation.js"],
   "styles": ["styles/style.css"],
   "dependencies": [
     {
