@@ -2,7 +2,7 @@
   "name": "pf2e-advanced-automation",
   "title": "PF2e Advanced Automation",
   "description": "Adds more automation to the PF2e system",
-  "version": "0.1.0",
+  "version": "",
   "authors": [
     {
       "name": "Chippy",
@@ -26,6 +26,7 @@
       "path": "lang/en.json"
     }
   ],
-  "url": "https://github.com/ChippyDev/pf2e-advanced-automation",
-  "manifest": "https://raw.githubusercontent.com/ChippyDev/pf2e-advanced-automation/master/module.json"
+  "url": "",
+  "manifest": "",
+  "download": ""
 }
