@@ -315,6 +315,47 @@ class AutomatedEffect {
     if (saveRoll.total >= effectFlags.difficultyClass) this.delete(effectItem);
   }
 
+  static async linkActors() {
+    let companions = [];
+    let names = [];
+    for (let item of game.user.targets) {
+      if (item.actor.id == canvas.tokens.controlled[0].actor.id) {
+        ui.notifications.warn('You cannot link an actor to itself');
+        continue;
+      }
+      companions.push(item.actor.id);
+      names.push(item.actor.name);
+    }
+    function _link() {
+      if (!canvas.tokens.controlled[0] || companions.length == 0) return;
+      canvas.tokens.controlled[0].actor.setFlag(AdvancedAutomation.ID, AdvancedAutomation.FLAGS.EFFECT, {
+        linkedActors: companions,
+      });
+      ui.notifications.info(`Actor${companions.length > 1 ? 's' : ''} Linked`);
+    }
+
+    await Dialog.confirm({
+      title: 'Link Actors?',
+      content: `
+      <p>${
+        names.length > 0
+          ? `Do you want to add the following actor${companions.length > 1 ? 's' : ''} to the linked actors of ${
+              canvas.tokens.controlled[0].name
+            } ?`
+          : 'Select your Character and Target the Actor(s) you want to link'
+      }</p>
+      <p>${names}</p>
+      `,
+      yes: () => _link(),
+      defaultYes: false,
+    });
+  }
+
+  static unlinkActors() {
+    canvas.tokens.controlled[0].actor.unsetFlag(AdvancedAutomation.ID, AdvancedAutomation.FLAGS.EFFECT);
+    ui.notifications.info('all actors unlinked');
+  }
+
   /**
    *
    * @param {TokenPF2e} TokenPF2e
@@ -399,6 +440,11 @@ class AutomatedEffect {
     //AdvancedAutomation.log(tokenArray);
 
     for (let actorIndex = 0; actorIndex < tokenArray.length; actorIndex++) {
+      //AdvancedAutomation.log('attempt mass processing actor ' + actorIndex + ', onTurnEnd:' + onTurnEnd);
+      //AdvancedAutomation.log(tokenArray[actorIndex]);
+
+      this._handleLinkedActors(tokenArray[actorIndex], onTurnEnd);
+
       let effectArray = AutomatedEffect.retrieve(tokenArray[actorIndex], onTurnEnd);
       //AdvancedAutomation.log(effectArray);
       if (effectArray.length < 1) continue;
@@ -415,12 +461,36 @@ class AutomatedEffect {
    * @param {boolean} onTurnEnd
    */
   static async processAllEffects(tokenPF2e, onTurnEnd) {
+    this._handleLinkedActors(tokenPF2e, onTurnEnd);
+
     let effectArray = AutomatedEffect.retrieve(tokenPF2e, onTurnEnd);
     //AdvancedAutomation.log(effectArray);
     if (effectArray.length < 1) return;
 
     for (let effectIndex = 0; effectIndex < effectArray.length; effectIndex++) {
       await AutomatedEffect.process(tokenPF2e, effectArray[effectIndex]);
+    }
+  }
+
+  static async _handleLinkedActors(tokenPF2e, onTurnEnd) {
+    let linkedActorIDs = tokenPF2e.actor.getFlag(
+      AdvancedAutomation.ID,
+      AdvancedAutomation.FLAGS.EFFECT + '.linkedActors'
+    );
+    AdvancedAutomation.log('Check for linked actors, ', linkedActorIDs);
+
+    if (linkedActorIDs?.length > 0) {
+      for (let linkedIndex = 0; linkedIndex < linkedActorIDs.length; linkedIndex++) {
+        const token = canvas.tokens.placeables.find((c) => c.data.actorId == linkedActorIDs[linkedIndex]);
+
+        let linkedEffectArray = AutomatedEffect.retrieve(token, onTurnEnd);
+        //AdvancedAutomation.log(effectArray);
+        if (linkedEffectArray.length < 1) continue;
+
+        for (let effectIndex = 0; effectIndex < linkedEffectArray.length; effectIndex++) {
+          await AutomatedEffect.process(token, linkedEffectArray[effectIndex]);
+        }
+      }
     }
   }
 }
@@ -483,7 +553,7 @@ class AutomatedEffectWindow extends FormApplication {
       };
     }
     const typeArray = Object.keys(AdvancedAutomation.TYPEIMAGES).map(getTypeData);
-    AdvancedAutomation.log(typeArray);
+    //AdvancedAutomation.log(typeArray);
 
     return { types: typeArray };
   }
