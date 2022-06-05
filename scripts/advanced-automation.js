@@ -159,12 +159,12 @@ class AutomatedEffect {
     };
 
     let currentEffect = this.retrieve(canvas.tokens.get(tokenId)).find(
-      (c) => c.data.flags[AdvancedAutomation.ID][AdvancedAutomation.FLAGS.EFFECT]?.type == CLEAN_DATA.type
+      (c) => c.data.flags[AdvancedAutomation.ID]?.[AdvancedAutomation.FLAGS.EFFECT]?.type == CLEAN_DATA.type
     );
 
     if (currentEffect) {
       if (!shouldForce) {
-        const CURRENT_DATA = currentEffect.data.flags[AdvancedAutomation.ID][AdvancedAutomation.FLAGS.EFFECT];
+        const CURRENT_DATA = currentEffect.data.flags[AdvancedAutomation.ID]?.[AdvancedAutomation.FLAGS.EFFECT];
         let currentAmount = await new Roll(CURRENT_DATA.dieFormula).evaluate({ maximize: true }).total;
         let newAmount = await new Roll(CLEAN_DATA.dieFormula).evaluate({ maximize: true }).total;
 
@@ -283,7 +283,7 @@ class AutomatedEffect {
       return effects;
     }
     let effects = actor.items.filter(
-      (item) => item.type === 'effect' && item.data.flags[AdvancedAutomation.ID][AdvancedAutomation.FLAGS.EFFECT]
+      (item) => item.type === 'effect' && item.data.flags[AdvancedAutomation.ID]?.[AdvancedAutomation.FLAGS.EFFECT]
     );
     //AdvancedAutomation.log(effects);
     return effects;
@@ -313,7 +313,7 @@ class AutomatedEffect {
       ui.notifications.warn('You already saved on this effect');
       return;
     }
-    const effectFlags = effectItem.data.flags[AdvancedAutomation.ID][AdvancedAutomation.FLAGS.EFFECT];
+    const effectFlags = effectItem.data.flags[AdvancedAutomation.ID]?.[AdvancedAutomation.FLAGS.EFFECT];
     const saveRoll = new Roll('1d20');
 
     const messageData = await saveRoll.toMessage({}, { create: false });
@@ -390,7 +390,7 @@ class AutomatedEffect {
    */
   static async process(tokenPF2e, effectItem) {
     //AdvancedAutomation.log(tokenPF2e, effectFlags);
-    const DATA = effectItem.data.flags[AdvancedAutomation.ID][AdvancedAutomation.FLAGS.EFFECT];
+    const DATA = effectItem.data.flags[AdvancedAutomation.ID]?.[AdvancedAutomation.FLAGS.EFFECT];
     //AdvancedAutomation.log(DATA);
     const DICEROLL = await new Roll(DATA.dieFormula).roll({ async: true });
     //AdvancedAutomation.log(DICEROLL);
