@@ -6,22 +6,31 @@ class AdvancedAutomation {
   };
 
   static TYPEIMAGES = {
-    bleed: 'systems/pf2e/icons/spells/blood-vendetta.webp',
-    fire: 'systems/pf2e/icons/spells/produce-flame.webp',
-    acid: 'systems/pf2e/icons/spells/cloudkill.webp',
-    cold: 'systems/pf2e/icons/spells/clinging-ice.webp',
-    electricity: 'icons/magic/lightning/bolt-strike-purple-pink.webp',
-    force: 'systems/pf2e/icons/spells/magic-missile.webp',
-    mental: 'systems/pf2e/icons/spells/modify-memory.webp',
-    sonic: 'systems/pf2e/icons/spells/cry-of-destruction.webp',
-    poison: 'icons/magic/nature/root-vine-thorns-poison-green.webp',
-    lawful: 'systems/pf2e/icons/equipment/adventuring-gear/merchant-scale.webp',
-    chaotic: 'systems/pf2e/icons/spells/prismatic-wall.webp',
-    good: 'systems/pf2e/icons/spells/angelic-messenger.webp',
-    evil: 'systems/pf2e/icons/spells/daemonic-pact.webp',
-    positive: 'systems/pf2e/icons/spells/positive-luminance.webp',
-    negative: 'systems/pf2e/icons/spells/bind-soul.webp',
-    //healing: 'systems/pf2e/icons/spells/life-siphon.webp',
+    damage: {
+      slashing: 'icons/skills/melee/strike-sword-steel-yellow.webp',
+      bludgeoning: 'icons/skills/melee/strike-hammer-destructive-blue.webp',
+      piercing: 'icons/skills/melee/strike-polearm-light-orange.webp',
+      bleed: 'systems/pf2e/icons/spells/blood-vendetta.webp',
+      fire: 'systems/pf2e/icons/spells/produce-flame.webp',
+      acid: 'systems/pf2e/icons/spells/cloudkill.webp',
+      cold: 'systems/pf2e/icons/spells/clinging-ice.webp',
+      electricity: 'icons/magic/lightning/bolt-strike-purple-pink.webp',
+      force: 'systems/pf2e/icons/spells/magic-missile.webp',
+      mental: 'systems/pf2e/icons/spells/modify-memory.webp',
+      sonic: 'systems/pf2e/icons/spells/cry-of-destruction.webp',
+      poison: 'icons/magic/nature/root-vine-thorns-poison-green.webp',
+      lawful: 'systems/pf2e/icons/equipment/adventuring-gear/merchant-scale.webp',
+      chaotic: 'systems/pf2e/icons/spells/prismatic-wall.webp',
+      good: 'systems/pf2e/icons/spells/angelic-messenger.webp',
+      evil: 'systems/pf2e/icons/spells/daemonic-pact.webp',
+      positive: 'systems/pf2e/icons/spells/positive-luminance.webp',
+      negative: 'systems/pf2e/icons/spells/bind-soul.webp',
+    },
+    healing: {
+      fasthealing: 'systems/pf2e/icons/spells/life-boost.webp',
+      regeneration: 'systems/pf2e/icons/spells/life-siphon.webp',
+    },
+    special: {},
   };
 
   static TEMPLATES = {
@@ -58,6 +67,16 @@ class AdvancedAutomation {
 
     for (let index = 0; index < InstanceArray.length; index++) {
       const instance = InstanceArray[index];
+      if (instance.isHealing) {
+        output.push({
+          totalChange: -instance.value,
+          resistValue: 0,
+          weakValue: 0,
+          immune: false,
+        });
+
+        continue;
+      }
       let DR = actorTraits.dr.find((c) => c.type == instance.type)?.value ?? 0;
       let DV = actorTraits.dv.find((c) => c.type == instance.type)?.value ?? 0;
       let sum = instance.value;
@@ -80,7 +99,7 @@ class AdvancedAutomation {
     game.settings.register(this.ID, this.SETTINGS.BATCH_PROCESS_ACTORS, {
       config: true,
       default: true,
-      hint: `Process the persistant effects on all copy's of an actor on any copy's turn`,
+      hint: `Process the persistent effects on all copy's of an actor on any copy's turn`,
       name: `Batch Process Actors`,
       scope: 'world',
       type: Boolean,
@@ -107,6 +126,7 @@ Hooks.once('devModeReady', ({ registerPackageDebugFlag }) => {
  * @property {number} difficultyClass
  * @property {boolean} isEndOfTurn
  * @property {boolean} isHealing
+ * @property {boolean} isSilent
  * @property {number} duration - the duration of the effect in rounds
  * @property {object} ruleElements - rule element object to apply to the effect
  */
@@ -133,6 +153,7 @@ class AutomatedEffect {
       difficultyClass: Math.min(effectFlags.difficultyClass, 255) ?? 15,
       isEndOfTurn: effectFlags.isEndOfTurn ?? true,
       isHealing: effectFlags.isHealing ?? false,
+      isSilent: effectFlags.isSilent ?? false,
       duration: Math.min(effectFlags.duration, 52564442400) ?? 0,
       ruleElements: effectFlags.ruleElements ?? [],
     };
@@ -191,11 +212,14 @@ class AutomatedEffect {
       const { type, dieFormula, difficultyClass } = effectFlags;
       const dcStr = difficultyClass == 15 ? '' : ` DC${String(difficultyClass)}`;
       const kind = !effectFlags.isHealing ? 'damage' : 'healing';
-      return `Persistent ${kind} (${String(dieFormula.toUpperCase())} ${type}${dcStr})`;
+      const silent = effectFlags.isSilent ? 'Silent ' : '';
+      return `${silent}Persistent ${kind} (${String(dieFormula.toUpperCase())} ${game.i18n.localize(
+        `PF2E-ADVANCED-AUTOMATION.types.${type}`
+      )}${dcStr})`;
     }
 
     /**
-     *F
+     *
      * @param {effectFlags} effectFlags effectFlags
      * @returns {object} foundry ready effect item data
      */
@@ -215,10 +239,12 @@ class AutomatedEffect {
           },
           rules: effectFlags.ruleElements,
           tokenIcon: {
-            show: true,
+            show: effectFlags.isSilent ? false : true,
           },
         },
-        img: AdvancedAutomation.TYPEIMAGES[effectFlags.type.toLowerCase()],
+        img: effectFlags.isHealing
+          ? AdvancedAutomation.TYPEIMAGES.healing[effectFlags.type]
+          : AdvancedAutomation.TYPEIMAGES.damage[effectFlags.type],
       };
     }
 
@@ -232,8 +258,8 @@ class AutomatedEffect {
    *
    */
   static _initialize() {
-    this.window = new AutomatedEffectWindow();
-    $(document).on('click', 'button.automated-effets.player-save-button', function () {
+    this.ui = new AutomatedEffectWindow();
+    $(document).on('click', 'button.automated-effects.player-save-button', function () {
       AutomatedEffect.playerSave($(this).data('token-id'), $(this).data('effect-id'));
     });
   }
@@ -246,12 +272,12 @@ class AutomatedEffect {
    */
   static retrieve(token, onTurnEnd) {
     let actor = token.actor;
-    //AdvancedAutomation.log('retrieve', turnEnd);
+    //AdvancedAutomation.log('retrieve', onTurnEnd);
     if (onTurnEnd != undefined) {
       let effects = actor.items.filter(
         (item) =>
           item.type === 'effect' &&
-          item.data.flags[AdvancedAutomation.ID][AdvancedAutomation.FLAGS.EFFECT]?.isEndOfTurn == onTurnEnd
+          item.data.flags[AdvancedAutomation.ID]?.[AdvancedAutomation.FLAGS.EFFECT]?.isEndOfTurn == onTurnEnd
       );
       //AdvancedAutomation.log(effects);
       return effects;
@@ -372,28 +398,30 @@ class AutomatedEffect {
     AdvancedAutomation.log('Processing an NPC:', isNPC);
 
     let healthInfo = AdvancedAutomation.calculateHealthChange(tokenPF2e, [
-      { type: DATA.type, value: DICEROLL.total },
+      { type: DATA.type, value: DICEROLL.total, isHealing: DATA.isHealing },
     ])[0];
 
     let html = `
-    <p class=action-content>${tokenPF2e.name} ${DATA.isHealing ? 'receives' : 'takes'} ${
-      healthInfo.totalChange
-    } persistant ${DATA.type} ${DATA.isHealing ? 'healing' : 'damage'}</p>
-    ${isNPC ? '<div class="automated-effets gm-info" data-visibility="gm">' : ''}
+    <p class=action-content>${tokenPF2e.name} ${
+      DATA.isHealing ? `receives ${-healthInfo.totalChange}` : `takes ${healthInfo.totalChange}`
+    } persistent ${game.i18n.localize(`PF2E-ADVANCED-AUTOMATION.types.${DATA.type}`)} ${
+      DATA.isHealing ? '' : 'damage'
+    }</p>
+    ${isNPC ? '<div class="automated-effects gm-info" data-visibility="gm">' : ''}
     ${healthInfo.resistValue > 0 ? `<p class=action-content>${healthInfo.resistValue} Resisted</p>` : ''}
     ${healthInfo.weakValue > 0 ? `<p class=action-content>${healthInfo.weakValue} Weakness</p>` : ''}
     ${
-      !isNPC
+      !isNPC && !DATA.isHealing
         ? `
         <div class="message-buttons" data-visibility="all">
-        <button name="savebutton" data-effect-id="${effectItem.id}" data-token-id="${tokenPF2e.id}" class="automated-effets player-save-button">
+        <button name="savebutton" data-effect-id="${effectItem.id}" data-token-id="${tokenPF2e.id}" class="automated-effects player-save-button">
         Roll Save
         </button>
         </div>
         `
         : ''
     }
-    ${isNPC ? `<p class=action-content>NPC Save Roll: ${_NPCSave()}</p> </div>` : ''}
+    ${isNPC && !DATA.isHealing ? `<p class=action-content>NPC Save Roll: ${_NPCSave()}</p> </div>` : ''}
     `;
 
     function _NPCSave() {
@@ -402,11 +430,13 @@ class AutomatedEffect {
       return saveRoll.total;
     }
 
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: tokenPF2e.actor }),
-      content: html,
-      type: 3,
-    });
+    if (!DATA.isSilent) {
+      await ChatMessage.create({
+        speaker: ChatMessage.getSpeaker({ actor: tokenPF2e.actor }),
+        content: html,
+        type: 3,
+      });
+    }
 
     let tempHP = tokenPF2e.actor.data.data.attributes.hp.temp;
 
@@ -440,7 +470,7 @@ class AutomatedEffect {
     //AdvancedAutomation.log(tokenArray);
 
     for (let actorIndex = 0; actorIndex < tokenArray.length; actorIndex++) {
-      //AdvancedAutomation.log('attempt mass processing actor ' + actorIndex + ', onTurnEnd:' + onTurnEnd);
+      AdvancedAutomation.log('attempt mass processing actor ' + actorIndex + ', onTurnEnd:' + onTurnEnd);
       //AdvancedAutomation.log(tokenArray[actorIndex]);
 
       this._handleLinkedActors(tokenArray[actorIndex], onTurnEnd);
@@ -514,16 +544,17 @@ class AutomatedEffectWindow extends FormApplication {
 
   _collectData(html) {
     return {
-      type: html.find('[name=type]:checked').val() || 'acid',
+      type: html.find('[name=type]:checked').val() || 'chaotic',
       dieFormula: html.find('[name="damage"]').val() || '1d6',
       difficultyClass: Number(html.find('[name="DC"]').val()) || 15,
-      isHealing: html.find('[name=type]:checked').val() == 'Healing' ? true : false,
-      isEndOfTurn: html.find('[name="endOfTurn"]')[0].checked || true,
+      isHealing: html.find('[name=isHealing]')[0].checked,
+      isEndOfTurn: html.find('[name="endOfTurn"]')[0].checked,
+      isSilent: html.find('[name="isSilent"]')[0].checked,
       duration: Number(html.find('[name="duration"]').val()) || 0,
     };
   }
 
-  _handleButtonClick(html) {
+  _handleApplyButtonClick(html) {
     if (canvas.tokens.controlled.length < 1) {
       ui.notifications.warn('you must sellect a token');
       return;
@@ -535,27 +566,48 @@ class AutomatedEffectWindow extends FormApplication {
     }
   }
 
+  _handleTypeChange(html) {
+    let checkbox = html.find('input[name="isHealing"]');
+
+    if (html.find('input[name="type"]:checked[healing]')?.[0]) {
+      checkbox[0].checked = true;
+      return;
+    }
+    checkbox[0].checked = false;
+  }
+
   activateListeners(html) {
     super.activateListeners(html);
 
-    const applyButton = html.find("button[name='apply']");
-    applyButton.on('click', (event) => this._handleButtonClick(html));
+    let typeButton = html.find('input[name=type]');
+    typeButton.on('click', (event) => this._handleTypeChange(html));
+
+    let applyButton = html.find("button[name='apply']");
+    applyButton.on('click', (event) => this._handleApplyButtonClick(html));
 
     //html.on('click', "button[name='apply']", this._handleButtonClick(html));
   }
 
   getData() {
-    function getTypeData(type) {
+    function getDamageTypeData(type) {
       return {
         damageType: type,
-        name: type,
-        img: AdvancedAutomation.TYPEIMAGES[type],
+        name: game.i18n.localize(`PF2E-ADVANCED-AUTOMATION.types.${type}`),
+        img: AdvancedAutomation.TYPEIMAGES.damage[type],
       };
     }
-    const typeArray = Object.keys(AdvancedAutomation.TYPEIMAGES).map(getTypeData);
+    function getHealingTypeData(type) {
+      return {
+        healingType: type,
+        name: game.i18n.localize(`PF2E-ADVANCED-AUTOMATION.types.${type}`),
+        img: AdvancedAutomation.TYPEIMAGES.healing[type],
+      };
+    }
+    const damageTypeArray = Object.keys(AdvancedAutomation.TYPEIMAGES.damage).map(getDamageTypeData);
+    const healingTypeArray = Object.keys(AdvancedAutomation.TYPEIMAGES.healing).map(getHealingTypeData);
     //AdvancedAutomation.log(typeArray);
 
-    return { types: typeArray };
+    return { types: { damage: damageTypeArray, healing: healingTypeArray } };
   }
 }
 Hooks.on('pf2e.endTurn', (combatantPF2e) => {

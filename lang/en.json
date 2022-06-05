@@ -1,0 +1,26 @@
+{
+  "PF2E-ADVANCED-AUTOMATION": {
+    "types": {
+      "bleed": "Bleed",
+      "fire": "Fire",
+      "acid": "Acid",
+      "cold": "Cold",
+      "electricity": "Electricity",
+      "force": "Force",
+      "mental": "Mental",
+      "sonic": "Sonic",
+      "poison": "Poison",
+      "lawful": "Lawful",
+      "chaotic": "Chaotic",
+      "good": "Good",
+      "evil": "Evil",
+      "positive": "Positive",
+      "negative": "Negative",
+      "bludgeoning": "Bludgeoning",
+      "piercing": "Piercing",
+      "slashing": "Slashing",
+      "fasthealing": "Fast Healing",
+      "regeneration": "Regeneration"
+    }
+  }
+}

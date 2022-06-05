@@ -1,26 +1,44 @@
 <form>
   <div>
-    <p>Persistent Effect Type</p>
-    <div class='automated-effets effects-window damage-types types'>
-      {{#each types}}
+    <p>Persistent Damage Type</p>
+    <div class='automated-effects effects-window damage-types types'>
+      {{#each types.damage}}
         <div>
           <input type='radio' name='type' id='{{this.damageType}}' value='{{this.damageType}}' />
           <label for='{{this.damageType}}'><img src='{{this.img}}' />{{this.name}}</label>
         </div>
       {{/each}}
     </div>
+    <p>Persistent Healing Type</p>
+    <div class='automated-effects effects-window healing-types types'>
+      {{#each types.healing}}
+        <div>
+          <input type='radio' name='type' id='{{this.healingType}}' value='{{this.healingType}}' healing />
+          <label for='{{this.healingType}}'><img src='{{this.img}}' />{{this.name}}</label>
+        </div>
+      {{/each}}
+    </div>
   </div>
 
-  <div class='automated-effets effects-window form-group'>
+  <div class='automated-effects effects-window form-group'>
     <div class='form-fields'>
-      <label>Formula:</label>
-      <input title='Whats the damage formula for this Effect?' type='text' name='damage' placeholder='1d6' />
-      <label>Difficulty&nbsp;Class:</label>
-      <input title='Whats the recovery DC of this Effect?' type='number' name='DC' placeholder='15' />
-      <label>Duration:</label>
-      <input title='How long should this effect last? 0 for forever' type='number' name='duration' placeholder='0' />
-      <label>End&nbsp;of&nbsp;Turn:</label>
-      <input checked title='Should this Effect tick at the end of turn?' type='checkbox' name='endOfTurn' />
+      <label title='Whats the damage formula for this Effect?'>Formula
+        <input type='text' name='damage' placeholder='1d6' /></label>
+      <label title='Whats the recovery DC of this Effect?'>Difficulty&nbsp;Class
+        <input type='number' name='DC' placeholder='15' /></label>
+      <label title='How long should this Effect last? 0 for forever'>Duration
+        <input type='number' name='duration' placeholder='0' /></label>
+      <label title='Should this Effect tick at the end of turn?'>End&nbsp;of&nbsp;Turn
+        <input checked type='checkbox' name='endOfTurn' /></label>
+      <label
+        title='Removes the token icon and prevents chat messages, WARNING: this also removes all feedback as to whats happening use at your own risk!'
+      >Silent
+        <input type='checkbox' name='isSilent' /></label>
+    </div>
+    <div class='form-fields' style='display: none;'>
+      <p>Advanced&nbsp;Options:</p>
+      <label title='Should this Effect cause Healing instead of damage?'>Healing
+        <input type='checkbox' name='isHealing' /></label>
     </div>
   </div>
 </form>

@@ -1,14 +1,14 @@
-div.message-content > div.automated-effets.gm-info[data-visibility='gm'] {
+div.message-content > div.automated-effects.gm-info[data-visibility='gm'] {
   padding-left: 5px;
   display: block;
 }
 
-div.automated-effets.damage-types.types {
+div.automated-effects.effects-window.types {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-div.automated-effets.damage-types.types > div > label {
+div.automated-effects.effects-window.types > div > label {
   cursor: pointer;
   display: flex;
 
@@ -22,40 +22,43 @@ div.automated-effets.damage-types.types > div > label {
   background: #c0bcb3;
 }
 
-div.automated-effets.effects-window.damage-types.types > div > label:hover {
+div.automated-effects.effects-window.types > div > label:hover {
   box-shadow: 0 0 3px #c00;
 }
 
-div.automated-effets.effects-window.damage-types.types > div > input[type='radio']:checked + label {
+div.automated-effects.effects-window.types > div > input[type='radio']:checked + label {
   background: rgb(167 163 154);
 }
 
-div.automated-effets.effects-window.damage-types.types > div > label > img {
+div.automated-effects.effects-window.types > div > label > img {
   width: 25px;
   margin: 0 5px;
   align-items: left;
 }
 
-div.automated-effets.effects-window.damage-types.types > div > input {
+div.automated-effects.effects-window.types > div > input {
   opacity: 0;
   position: fixed;
   width: 0;
 }
 
-div.automated-effets.effects-window.damage-types.types > div {
+div.automated-effects.effects-window.types > div {
   margin-right: 5px;
 }
 
-div.automated-effets.effects-window.form-group {
+div.automated-effects.effects-window.form-group {
   color: black;
   flex: 0 0 100%;
   font-size: 12px;
   line-height: 16px;
-  margin: 10px 7px 5px 0;
+  margin: 10px 0 5px 0;
 }
 
-div.automated-effets.effects-window.form-group input[name='damage'] {
+div.automated-effects.effects-window.form-group > div.form-fields > label {
+  height: 52px;
+  flex: auto;
+}
+
+div.automated-effects.effects-window.form-group input[name='damage'] {
   flex: 3;
 }
-
-
