@@ -48,17 +48,28 @@ div.automated-effects.effects-window.types > div {
 
 div.automated-effects.effects-window.form-group {
   color: black;
-  flex: 0 0 100%;
+  display: block;
   font-size: 12px;
   line-height: 16px;
   margin: 10px 0 5px 0;
 }
 
-div.automated-effects.effects-window.form-group > div.form-fields > label {
+div.automated-effects.effects-window.form-group div.form-fields > label {
   height: 52px;
   flex: auto;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 
 div.automated-effects.effects-window.form-group input[name='damage'] {
   flex: 3;
+}
+
+div.automated-effects.effects-window.form-group h2 {
+  margin-top: 0.5rem;
+}
+
+.automated-effects-hidden {
+  display: none !important;
 }

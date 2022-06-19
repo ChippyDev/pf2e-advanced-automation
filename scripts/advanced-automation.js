@@ -530,7 +530,7 @@ class AutomatedEffectWindow extends FormApplication {
     const defaults = super.defaultOptions;
 
     const overrides = {
-      width: 450,
+      width: 470,
       height: 'auto',
       id: 'Automated-Effect-Window',
       template: AdvancedAutomation.TEMPLATES.EFFECTWINDOW,
@@ -547,6 +547,7 @@ class AutomatedEffectWindow extends FormApplication {
       type: html.find('[name=type]:checked').val() || 'chaotic',
       dieFormula: html.find('[name="damage"]').val() || '1d6',
       difficultyClass: Number(html.find('[name="DC"]').val()) || 15,
+      saveType: html.find('[name="saveType"]').val(),
       isHealing: html.find('[name=isHealing]')[0].checked,
       isEndOfTurn: html.find('[name="endOfTurn"]')[0].checked,
       isSilent: html.find('[name="isSilent"]')[0].checked,
@@ -576,6 +577,13 @@ class AutomatedEffectWindow extends FormApplication {
     checkbox[0].checked = false;
   }
 
+  _optionsTextClick(event, html) {
+    if (event.ctrlKey) {
+      document.getElementById('Automated-Effect-Window').style.height = 'auto';
+      html.find('div[name="experimentalOptions"]')[0].classList.toggle('automated-effects-hidden');
+    }
+  }
+
   activateListeners(html) {
     super.activateListeners(html);
 
@@ -584,6 +592,9 @@ class AutomatedEffectWindow extends FormApplication {
 
     let applyButton = html.find("button[name='apply']");
     applyButton.on('click', (event) => this._handleApplyButtonClick(html));
+
+    let optionsText = html.find("h2[name='options']");
+    optionsText.on('click', (event) => this._optionsTextClick(event, html));
 
     //html.on('click', "button[name='apply']", this._handleButtonClick(html));
   }

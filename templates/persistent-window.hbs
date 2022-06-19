@@ -1,6 +1,6 @@
 <form>
   <div>
-    <p>Persistent Damage Type</p>
+    <h2>Persistent Damage Type</h2>
     <div class='automated-effects effects-window damage-types types'>
       {{#each types.damage}}
         <div>
@@ -9,7 +9,7 @@
         </div>
       {{/each}}
     </div>
-    <p>Persistent Healing Type</p>
+    <h2>Persistent Healing Type</h2>
     <div class='automated-effects effects-window healing-types types'>
       {{#each types.healing}}
         <div>
@@ -21,6 +21,7 @@
   </div>
 
   <div class='automated-effects effects-window form-group'>
+    <h2 name='options' style='flex: inherit;'>Options:</h2>
     <div class='form-fields'>
       <label title='Whats the damage formula for this Effect?'>Formula
         <input type='text' name='damage' placeholder='1d6' /></label>
@@ -30,15 +31,25 @@
         <input type='number' name='duration' placeholder='0' /></label>
       <label title='Should this Effect tick at the end of turn?'>End&nbsp;of&nbsp;Turn
         <input checked type='checkbox' name='endOfTurn' /></label>
-      <label
-        title='Removes the token icon and prevents chat messages, WARNING: this also removes all feedback as to whats happening use at your own risk!'
-      >Silent
-        <input type='checkbox' name='isSilent' /></label>
     </div>
-    <div class='form-fields' style='display: none;'>
-      <p>Advanced&nbsp;Options:</p>
-      <label title='Should this Effect cause Healing instead of damage?'>Healing
-        <input type='checkbox' name='isHealing' /></label>
+    <div class='automated-effects-hidden' name='experimentalOptions'>
+      <h2 style='flex: inherit;'>Experimental&nbsp;Options:</h2>
+      <div class='form-fields'>
+        <label title='Should this Effect cause Healing instead of damage?'>Healing
+          <input type='checkbox' name='isHealing' /></label>
+        <label
+          title='Removes the token icon and prevents chat messages, WARNING: this also removes all feedback as to whats happening use at your own risk!'
+        >Silent
+          <input type='checkbox' name='isSilent' /></label>
+          {{!<label title='What kind of save is needed to remove this effect?'>Save Type
+          <select name='saveType'>
+            <option value='flat'>Flat</option>
+            <option value='fortitude'>Fortitude</option>
+            <option value='reflex'>Reflex</option>
+            <option value='will'>Will</option>
+          </select>}}
+        </label>
+      </div>
     </div>
   </div>
 </form>
